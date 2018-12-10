@@ -21,8 +21,37 @@ Windows 10 :
 
 ## Créer votre application
 
+Initialisez votre application
+```shell
+react-native init VotreApp
+```
+```shell
+cd VotreApp
+```
+Importer le module ```react-native-ble-plx```
+```shell
+npm install --save react-native-ble-plx
+```
+```shell
+react-native link react-native-ble-plx
+```
+
+
+## FAQ
+
+- Problème : *Cannot find module 'asap/raw'*
+ 
+  Solution : Supprimer le dossier node_modules, faire ```npm install```
+
+- Problème :  *Manifest merger failed : uses-sdk:minSdkVersion 16 cannot be smaller than version 18 declared in library*
+
+  Solution : Ouvrir ```build.gradle```, modifier minSdkVersion pour **18**
+
 ## Bibliographie
 - [Kerberos Morphy RN-Hello-World-Java-C++](https://github.com/KerberosMorphy/rn-hello-world-java-cpp)
+- [React Native BLE PLX](https://polidea.github.io/react-native-ble-plx/)
+- [Martyn Currey HM-10](http://www.martyncurrey.com/hm-10-bluetooth-4ble-modules/)
+- [StackOverflow](https://stackoverflow.com/questions/50137867/send-data-using-react-native-ble-plx-package)
 ## Licence
 ```
 MIT License

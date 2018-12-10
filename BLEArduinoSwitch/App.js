@@ -73,13 +73,24 @@ export default class App extends Component<Props, State> {
                     this._log("Device: " + device.name, device);
                     this._addToList(device.name);
                     if (device.name === 'ULtron01') {
-                        this._deviceConnection(device)
+                        this._stopDeviceScan();
+                        const msg = 'Connecting to ' + device.name;
+                        this._log(msg);
+                        this._deviceConnection(device);
                     }
                 }
                 this.delay();
             }
         );
     }
+
+    _stopDeviceScan = () => {
+        this.manager.stopDeviceScan();
+        this._log('Stop scanning');
+        this.setState({
+            devicesList: []
+        })
+    };
     /*
      *logger du text à l'écran
      */
@@ -100,15 +111,19 @@ export default class App extends Component<Props, State> {
     /*
      * se connecter à un device
      */
-    _deviceConnection = (device) => {
+    _deviceConnection = (device: Device) => {
         device.connect()
             .then((device) => {
+                const msg = 'Discovering services and characteristics of ' + device.name;
+                this._log(msg);
                 return device.discoverAllServicesAndCharacteristics()
             })
-            .then((device) => {
+            .then((device: Device) => {
                 this.setState({
                     device: device
-                })
+                });
+                console.log(this.state.device);
+                device.writeCharacteristicWithResponseForService()
                 // Do work on device with services and characteristics
             })
             .catch((error) => {
@@ -147,6 +162,25 @@ export default class App extends Component<Props, State> {
         });
     };
     /*
+     * Allumer LED
+     */
+    ledOn = () => {
+
+    };
+    /*
+     * Éteindre LED
+     */
+    ledOff = () => {
+
+    };
+    /*
+     * écrire message via serial
+     */
+    serialMessage = (msg) => {
+
+    };
+
+    /*
      * fonction de base de RN pour afficher le rendu
      */
     render() {
@@ -178,13 +212,13 @@ export default class App extends Component<Props, State> {
                 />
                 <Button
                     onPress={() => {
-                        this.manager.stopDeviceScan()
+                        this.ledOn()
                     }}
                     title={"LED ON"}
                 />
                 <Button
                     onPress={() => {
-                        this.manager.stopDeviceScan()
+                        this.ledOff()
                     }}
                     title={"LED OFF"}
                 />
