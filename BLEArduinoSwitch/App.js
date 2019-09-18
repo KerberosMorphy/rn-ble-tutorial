@@ -33,6 +33,9 @@ function arrayBufferToHex(buffer) {
 export default class App extends Component<Props, State> {
     constructor(props: Props) {
         super(props);
+        this.serviceUUID = "0000FFE00-0000-1000-8000-00805F9B34FB";
+        this.charUUID = "0000FFE2-0000-1000-8000-000805F9B34FB";
+        this.UUID = "0x2901";
         this.state = {
             text: [],
             devicesList: [],
@@ -40,6 +43,8 @@ export default class App extends Component<Props, State> {
             device: null
         };
         this.manager = new BleManager();
+        this.device = null;
+        this.test = ["1","2","3"]
     }
 
     /*
@@ -72,11 +77,12 @@ export default class App extends Component<Props, State> {
                 if (this.state.devicesList.every((item) => item !== device.name)) {
                     this._log("Device: " + device.name, device);
                     this._addToList(device.name);
-                    if (device.name === 'ULtron01') {
+                    if (device.name === 'ULtron-27C0') {
                         this._stopDeviceScan();
                         const msg = 'Connecting to ' + device.name;
                         this._log(msg);
                         this._deviceConnection(device);
+                        this.device = new Device(device, this.manager);
                     }
                 }
                 this.delay();
@@ -85,8 +91,8 @@ export default class App extends Component<Props, State> {
     }
 
     _stopDeviceScan = () => {
-        this.manager.stopDeviceScan();
         this._log('Stop scanning');
+        this.manager.stopDeviceScan();
         this.setState({
             devicesList: []
         })
@@ -104,6 +110,7 @@ export default class App extends Component<Props, State> {
      * ajouter le nom d'un device à la liste (pas très fiable, peut manquer des device ayant le même nom)
      */
     _addToList = (device) => {
+        this._log(device);
         this.setState({
             devicesList: [device, ...this.state.devicesList]
         });
@@ -114,21 +121,29 @@ export default class App extends Component<Props, State> {
     _deviceConnection = (device: Device) => {
         device.connect()
             .then((device) => {
-                const msg = 'Discovering services and characteristics of ' + device.name;
+                const msg = 'Discovering services and characteristics of ' + device.name + " " + device.id + " " + device.uuid;
                 this._log(msg);
-                return device.discoverAllServicesAndCharacteristics()
+                return device.discoverAllServicesAndCharacteristics(device.id);
             })
             .then((device: Device) => {
                 this.setState({
                     device: device
                 });
-                console.log(this.state.device);
-                device.writeCharacteristicWithResponseForService()
+                this._log("Logging shit");
+                console.log(this.state);
+                //device.writeCharacteristicWithResponseForService();
+                //this._mappingFct(device);
+                //this._log(this.tmp.id)
                 // Do work on device with services and characteristics
             })
             .catch((error) => {
                 // Handle errors
             });
+    };
+    _mappingFct = (array : Array) => {
+        return array.map(param => {
+            this._log(param);
+        });
     };
     /*
      * logger les erreur à l'écran
@@ -206,7 +221,7 @@ export default class App extends Component<Props, State> {
                 />
                 <Button
                     onPress={() => {
-                        this.manager.stopDeviceScan()
+                        this._stopDeviceScan()
                     }}
                     title={"Stop"}
                 />
